@@ -1,0 +1,33 @@
+{
+  "name": "next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "build:clean": "rimraf .next && npm run build",
+    "start": "next start",
+    "pm2": "NODE_ENV=production pm2 start npm --name next -- start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fabio Riva",
+  "license": "ISC",
+  "dependencies": {
+    "@emotion/cache": "latest",
+    "@emotion/react": "latest",
+    "@emotion/styled": "latest",
+    "@emotion/server": "latest",
+    "@mui/icons-material": "latest",
+    "@mui/material": "latest",
+    "clsx": "latest",
+    "next": "latest",
+    "prop-types": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "swr": "^1.1.0"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2"
+  }
+}

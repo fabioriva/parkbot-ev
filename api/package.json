@@ -1,0 +1,29 @@
+{
+  "name": "parkbot-pi",
+  "version": "1.0.0",
+  "description": "Parkbot on a Raspberry PI!",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard",
+    "dev": "nodemon wallstreet/",
+    "start": "NODE_ENV=production pm2 start wallstreet/index.js --name api --max-memory-restart 128M"
+  },
+  "keywords": ["Parkbot", "Raspberry", "embedded"],
+  "author": "Fabio Riva",
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "^2.27.0",
+    "dotenv": "^10.0.0",
+    "node-fetch": "^2.6.1",
+    "node-snap7": "^1.0.6",
+    "pino": "^7.6.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15",
+    "standard": "^16.0.4"
+  },
+  "standard": {
+    "ignore": ["/public"]
+  }
+}
