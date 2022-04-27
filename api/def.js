@@ -24,31 +24,38 @@ exports.DATA_READ = {
   amount: DB_DATA_LEN,
   wordLen: 0x02
 }
-exports.REQ_0 = {
+// exports.REQ_0 = {
+//   area: 0x84,
+//   dbNumber: DB_DATA,
+//   start: 56,
+//   amount: 2,
+//   wordLen: 0x02
+// }
+// exports.REQ_1 = {
+//   area: 0x84,
+//   dbNumber: DB_DATA,
+//   start: 58,
+//   amount: 2,
+//   wordLen: 0x02
+// }
+// exports.REQ_2 = {
+//   area: 0x84,
+//   dbNumber: DB_DATA,
+//   start: 60,
+//   amount: 2,
+//   wordLen: 0x02
+// }
+// exports.REQ_3 = {
+//   area: 0x84,
+//   dbNumber: DB_DATA,
+//   start: 62,
+//   amount: 2,
+//   wordLen: 0x02
+// }
+exports.REQ_SWAP = {
   area: 0x84,
   dbNumber: DB_DATA,
-  start: 56,
-  amount: 2,
-  wordLen: 0x02
-}
-exports.REQ_1 = {
-  area: 0x84,
-  dbNumber: DB_DATA,
-  start: 58,
-  amount: 2,
-  wordLen: 0x02
-}
-exports.REQ_2 = {
-  area: 0x84,
-  dbNumber: DB_DATA,
-  start: 60,
-  amount: 2,
-  wordLen: 0x02
-}
-exports.REQ_3 = {
-  area: 0x84,
-  dbNumber: DB_DATA,
-  start: 62,
+  start: 90,
   amount: 2,
   wordLen: 0x02
 }
@@ -71,7 +78,7 @@ exports.STALL_STATUS = {
 
 exports.MAP_READ = {
   area: 0x84,
-  dbNumber: 542,
+  dbNumber: 510,
   start: 0,
   amount: STALLS * STALL_LEN,
   wordLen: 0x02

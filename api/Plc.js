@@ -36,7 +36,6 @@ class PLC extends EventEmitter {
       this.error(error)
     } finally {
       this.publish('aps/overview', obj.overview)
-      // return obj.overview
     }
   }
 
@@ -44,10 +43,7 @@ class PLC extends EventEmitter {
     try {
       const buffer = await this.read(def.MAP_READ)
       const stalls = await updateStalls(0, buffer, def.STALL_LEN, obj.stalls)
-      // const data = occupancy(0, stalls, def.STALL_STATUS)
-      // obj.map.occupancy = data
       this.publish('aps/stalls', stalls)
-      // return stalls
     } catch (error) {
       this.error(error)
     }
@@ -65,24 +61,8 @@ class PLC extends EventEmitter {
   forever (def, obj) {
     setTimeout(async () => {
       if (this.online) {
-        // const hrstart = process.hrtime()
-        // const data = await Promise.all([
-        //   this.data(def, obj),
-        //   this.map(def, obj)
-        // ])
-        // console.log(JSON.stringify(data[0]))
-        // this.publish('aps/data', data)
         await this.data(def, obj)
         await this.map(def, obj)
-        // const hrend = process.hrtime(hrstart)
-        // console.info(
-        //   'Execution time (hr):',
-        //   hrend,
-        //   hrend[0],
-        //   's',
-        //   hrend[1] / 1000000,
-        //   'ms'
-        // )
       } else {
         this.online = this.client.Connect()
         logger.info('re-connecting... %s', this.online)

@@ -7,12 +7,12 @@ class Stall {
     nr,
     status = 0,
     date = format(new Date('1990-01-01 00:00:00'), 'yyyy-MM-dd HH:mm:ss'),
-    myEv = 0
+    size = 0
   ) {
     this.nr = nr
     this.status = status
     this.date = date
-    this.myEv = myEv // 0=no, 1=ready, 2=busy
+    this.size = size
   }
 
   update (buffer) {
@@ -21,7 +21,7 @@ class Stall {
       getPlcDateTime(buffer.readInt16BE(2), buffer.readInt32BE(4)),
       'yyyy-MM-dd HH:mm:ss'
     )
-    this.myEv = buffer.readInt16BE(8)
+    this.size = buffer.readInt16BE(8)
   }
 }
 
