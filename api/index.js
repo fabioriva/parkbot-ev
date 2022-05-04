@@ -8,13 +8,11 @@ const routes = require('./routes')
 
 const prefix = '/api/wallstreet'
 
-const EV_STALLS = [265, 269]
 
-const PW_BACKEND = '13.58.53.66:5500'
 
 const checkEvStall = async (id, slot) => {
   try {
-    const url = `http://${PW_BACKEND}/exitIsEnabled/${id}/${slot}`
+    const url = `http://${def.PW_BACKEND}/exitIsEnabled/${id}/${slot}`
     const res = await fetch(url, {})
     const json = await res.json()
     console.log('checkEvStall', url, id, slot, json)
@@ -28,14 +26,11 @@ const checkEvStall = async (id, slot) => {
 const queue = (plc, data) => {
   data.queue.forEach(async (element, key) => {
     const { id, card, stall } = element
-    // console.log('1', id, card, stall)
     if (stall < 1 || stall > def.STALLS) return
-    const found = EV_STALLS.find(element => element === stall)
+    const found = def.EV_STALLS.find(element => element === stall)
     if (found === undefined) return
-    console.log('queue', id, card, stall)
-
     const json = await checkEvStall(card, stall)
-    console.log('Stall is busy:', json)
+    if (json.busy === undefined) return
     const IS_CHARGING = json.busy
     if (!IS_CHARGING) {
       const buffer = Buffer.allocUnsafe(2)

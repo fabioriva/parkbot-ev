@@ -10,6 +10,10 @@ exports.PLC = {
   polling_time: 999
 }
 
+exports.EV_STALLS = [265, 269]
+
+exports.PW_BACKEND = '13.58.53.66:5500'
+
 exports.QUEUE_LEN = 5
 
 const DB_DATA = 541
@@ -83,11 +87,17 @@ exports.MAP_READ = {
   amount: STALLS * STALL_LEN,
   wordLen: 0x02
 }
-
-// exports.STALLS_READ = {
-//   area: 0x84,
-//   dbNumber: 542,
-//   start: 0,
-//   amount: STALLS * 2,
-//   wordLen: 0x02
-// }
+exports.EV_STALLS_READ = {
+  area: 0x84,
+  dbNumber: 542,
+  start: 0,
+  amount: STALLS * 2,
+  wordLen: 0x02
+}
+exports.EV_CARDS_READ = {
+  area: 0x84,
+  dbNumber: 543,
+  start: 0,
+  amount: CARDS * 2,
+  wordLen: 0x02
+}

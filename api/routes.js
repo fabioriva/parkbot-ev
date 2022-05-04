@@ -10,7 +10,6 @@ function log(req) {
 }
 
 function checkCard(card, def) {
-    console.log('checkCard', card)
     if (!Number.isInteger(card)) {
         return {
             severity: 'error',
@@ -130,9 +129,12 @@ function routes(app, def, obj, plc, options) {
         if (severity === 'error') {
             return sendJson(res, { severity, message })
         }
-        const found = obj.stalls.find(stall => stall.status === card)
-        if (found === undefined) {
+        const stall = obj.stalls.find(stall => stall.status === card)
+        if (stall === undefined) {
             return sendJson(res, { severity: 'error', message: 'Card not present' })
+        }
+        if (def.EV_STALLS.find(element => element === stall.nr) === undefined) {
+            return sendJson(res, { severity: 'error', message: 'Card not parked in EV stall' })
         }
         res.onAborted(() => {
             res.aborted = true
