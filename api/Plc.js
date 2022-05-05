@@ -30,7 +30,8 @@ class PLC extends EventEmitter {
       const buffer = await this.read(def.DATA_READ)
       await Promise.all([
         updateDevices(def.DB_DATA_INIT_DEVICE, buffer, 6, obj.devices),
-        updateQueue(def.DB_DATA_INIT_QUEUE, buffer, 4, obj.queue)
+        updateQueue(def.DB_DATA_INIT_EXIT_QUEUE, buffer, 6, obj.exitQueue),
+        updateQueue(def.DB_DATA_INIT_SWAP_QUEUE, buffer, 6, obj.swapQueue)
       ])
     } catch (error) {
       this.error(error)

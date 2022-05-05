@@ -148,7 +148,7 @@ function routes(app, def, obj, plc, options) {
         // success
         sendJson(res, {
             severity: 'success',
-            message: 'shuffle request for card ' + card
+            message: 'Sent shuffle request for card ' + card
         })
     })
 }

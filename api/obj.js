@@ -14,12 +14,16 @@ const devices = [EVT1, EVT2, EVT3, IVT4, IVT5, IVT6]
 
 exports.devices = devices
 
-const queue = generateQueue(def)
-exports.queue = queue
+const exitQueue = generateQueue(def.QUEUE_LEN)
+exports.exitQueue = exitQueue
+
+const swapQueue = generateQueue(def.QUEUE_LEN)
+exports.swapQueue = swapQueue
 
 exports.overview = {
   devices,
-  queue
+  exitQueue,
+  swapQueue
 }
 
 const stalls = generateStalls(def)

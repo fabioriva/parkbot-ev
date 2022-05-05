@@ -1,21 +1,23 @@
 const util = require('util')
 
 class Queue {
-  constructor (id, card = 0, stall = 0) {
+  constructor (id, card = 0, slot = 0, size = 0) {
     this.id = id
     this.card = card
-    this.stall = stall
+    this.slot = slot
+    this.size = size
   }
 
   update (buffer) {
     this.card = buffer.readInt16BE(0)
-    this.stall = buffer.readInt16BE(2)
+    this.slot = buffer.readInt16BE(2)
+    this.size = buffer.readInt16BE(4)
   }
 }
 
-exports.generateQueue = def => {
+exports.generateQueue = len => {
   const queue = []
-  for (let i = 0; i < def.QUEUE_LEN; i++) {
+  for (let i = 0; i < len; i++) {
     queue.push(new Queue(i + 1))
   }
   return queue

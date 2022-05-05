@@ -17,9 +17,10 @@ exports.PW_BACKEND = '13.58.53.66:5500'
 exports.QUEUE_LEN = 5
 
 const DB_DATA = 541
-const DB_DATA_LEN = 66
+const DB_DATA_LEN = 104
 exports.DB_DATA_INIT_DEVICE = 0
-exports.DB_DATA_INIT_QUEUE = 36
+exports.DB_DATA_INIT_EXIT_QUEUE = 36
+exports.DB_DATA_INIT_SWAP_QUEUE = 70
 
 exports.DATA_READ = {
   area: 0x84,
@@ -59,7 +60,7 @@ exports.DATA_READ = {
 exports.REQ_SWAP = {
   area: 0x84,
   dbNumber: DB_DATA,
-  start: 90,
+  start: 104,
   amount: 2,
   wordLen: 0x02
 }

@@ -23,13 +23,14 @@ const checkEvStall = async (id, slot) => {
   }
 }
 
-const queue = (plc, data) => {
-  data.queue.forEach(async (element, key) => {
-    const { id, card, stall } = element
-    if (stall < 1 || stall > def.STALLS) return
-    const found = def.EV_STALLS.find(element => element === stall)
+const queue = (plc, queue) => {
+  queue.forEach(async (element, key) => {
+    const { id, card, slot, size } = element
+    // console.log('queue', id, card, slot, size)
+    if (slot < 1 || slot > def.STALLS) return
+    const found = def.EV_STALLS.find(element => element === slot)
     if (found === undefined) return
-    const json = await checkEvStall(card, stall)
+    const json = await checkEvStall(card, slot)
     if (json.busy === undefined) return
     const IS_CHARGING = json.busy
     if (!IS_CHARGING) {
@@ -38,7 +39,7 @@ const queue = (plc, data) => {
       const conn = {
         area: 0x84,
         dbNumber: 542,
-        start: stall === 1 ? 0 + 2 : (stall - 1) * 4 + 2,
+        start: slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2,
         amount: 2,
         wordLen: 0x02
       }
@@ -60,8 +61,12 @@ const start = async () => {
     const plc = new PLC(def.PLC)
     plc.main(def, obj)
     plc.on('pub', ({ channel, data }) => {
-      // console.log(channel, JSON.parse(data))
-      if (channel === 'aps/overview') queue(plc, JSON.parse(data))
+      // console.log(channel, JSON.parse(data))     
+      if (channel === 'aps/overview') {
+        const overview = JSON.parse(data)
+        queue(plc, overview.exitQueue)
+        // queue(plc, overview.swapQueue)
+      }
     })
     // routes
     routes(app, def, obj, plc, { prefix })
