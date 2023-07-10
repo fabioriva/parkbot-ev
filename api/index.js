@@ -65,7 +65,7 @@ const start = async () => {
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
         queue(plc, overview.exitQueue)
-        // queue(plc, overview.swapQueue)
+        queue(plc, overview.swapQueue)
       }
     })
     // routes
