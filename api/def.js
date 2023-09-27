@@ -10,9 +10,9 @@ exports.PLC = {
   polling_time: 999
 }
 
-exports.EV_STALLS = [265, 269]
-
-exports.PW_BACKEND = '13.58.53.66:5500'
+// exports.EV_STALLS = [215, 265, 269]
+// exports.PW_BACKEND = '13.58.53.66:5500'
+// exports.PW_API = 'https://smartcar.chargeworks.io/sotefin/api/exit_is_enabled' // ?stall=id&cardId=id
 
 exports.QUEUE_LEN = 5
 
@@ -29,34 +29,6 @@ exports.DATA_READ = {
   amount: DB_DATA_LEN,
   wordLen: 0x02
 }
-// exports.REQ_0 = {
-//   area: 0x84,
-//   dbNumber: DB_DATA,
-//   start: 56,
-//   amount: 2,
-//   wordLen: 0x02
-// }
-// exports.REQ_1 = {
-//   area: 0x84,
-//   dbNumber: DB_DATA,
-//   start: 58,
-//   amount: 2,
-//   wordLen: 0x02
-// }
-// exports.REQ_2 = {
-//   area: 0x84,
-//   dbNumber: DB_DATA,
-//   start: 60,
-//   amount: 2,
-//   wordLen: 0x02
-// }
-// exports.REQ_3 = {
-//   area: 0x84,
-//   dbNumber: DB_DATA,
-//   start: 62,
-//   amount: 2,
-//   wordLen: 0x02
-// }
 exports.REQ_SWAP = {
   area: 0x84,
   dbNumber: DB_DATA,
@@ -92,7 +64,7 @@ exports.EV_STALLS_READ = {
   area: 0x84,
   dbNumber: 542,
   start: 0,
-  amount: STALLS * 2,
+  amount: STALLS * 4,
   wordLen: 0x02
 }
 exports.EV_CARDS_READ = {

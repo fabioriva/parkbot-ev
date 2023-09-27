@@ -8,14 +8,17 @@ const routes = require('./routes')
 
 const prefix = '/api/wallstreet'
 
-
-
 const checkEvStall = async (id, slot) => {
   try {
-    const url = `http://${def.PW_BACKEND}/exitIsEnabled/${id}/${slot}`
-    const res = await fetch(url, {})
+    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+    const res = await fetch(url, {
+        headers: {
+               'Content-Type': 'application/json',
+                'x-api-key': process.env.PW_TOKEN
+              },
+	})
     const json = await res.json()
-    console.log('checkEvStall', url, id, slot, json)
+    console.log('checkEvStall', id, slot, json)
     return json
   } catch (err) {
     // console.error('error:', err)
@@ -28,7 +31,8 @@ const queue = (plc, queue) => {
     const { id, card, slot, size } = element
     // console.log('queue', id, card, slot, size)
     if (slot < 1 || slot > def.STALLS) return
-    const found = def.EV_STALLS.find(element => element === slot)
+    // const found = def.EV_STALLS.find(element => element === slot)
+    const found = obj.stalls.find(s => s.nr === slot && s.ev_type !== 0)
     if (found === undefined) return
     const json = await checkEvStall(card, slot)
     if (json.busy === undefined) return
@@ -38,7 +42,7 @@ const queue = (plc, queue) => {
       buffer.writeUInt16BE(json.busy, 0)
       const conn = {
         area: 0x84,
-        dbNumber: 542,
+        dbNumber: def.EV_STALLS_READ.dbNumber,
         start: slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2,
         amount: 2,
         wordLen: 0x02
@@ -61,7 +65,6 @@ const start = async () => {
     const plc = new PLC(def.PLC)
     plc.main(def, obj)
     plc.on('pub', ({ channel, data }) => {
-      // console.log(channel, JSON.parse(data))     
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
         queue(plc, overview.exitQueue)

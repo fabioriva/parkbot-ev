@@ -36,6 +36,10 @@ function routes(app, def, obj, plc, options) {
         log(req)
         sendJson(res, obj.stalls)
     })
+    app.get(prefix + '/stalls_ev', (res, req) => {
+        log(req)
+        sendJson(res, obj.stalls.filter(s => s.ev_type !== 0))
+    })
     // app.get(prefix + '/entry/:id/:card', async (res, req) => {
     //     log(req)
     //     const id = parseInt(req.getParameter(0))
@@ -129,11 +133,12 @@ function routes(app, def, obj, plc, options) {
         if (severity === 'error') {
             return sendJson(res, { severity, message })
         }
-        const stall = obj.stalls.find(stall => stall.status === card)
+        const stall = obj.stalls.find(s => s.status === card)
         if (stall === undefined) {
             return sendJson(res, { severity: 'error', message: 'Card not present' })
         }
-        if (def.EV_STALLS.find(element => element === stall.nr) === undefined) {
+        // if (def.EV_STALLS.find(element => element === stall.nr) === undefined) {
+        if (obj.stalls.find(s => s.nr === stall.nr && s.ev_type !== 0) === undefined) {
             return sendJson(res, { severity: 'error', message: 'Card not parked in EV stall' })
         }
         res.onAborted(() => {
@@ -148,7 +153,7 @@ function routes(app, def, obj, plc, options) {
         // success
         sendJson(res, {
             severity: 'success',
-            message: 'Sent shuffle request for card ' + card
+            message: 'Sent swap request for card ' + card
         })
     })
 }

@@ -1,7 +1,7 @@
 {
   "name": "parkbot-ev",
   "version": "1.0.0",
-  "description": "APS/CMEV interface",
+  "description": "Parkworks/Sotefin EV interface",
   "main": "index.js",
   "scripts": {
     "test": "standard",

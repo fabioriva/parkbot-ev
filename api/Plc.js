@@ -53,10 +53,22 @@ class PLC extends EventEmitter {
   async main (def, obj) {
     try {
       await this.connect()
+      await this.init(def, obj)
       this.forever(def, obj)
     } catch (err) {
       this.error(err)
     }
+  }
+
+  async init (def, obj) {
+    const buffer = await this.read(def.EV_STALLS_READ)
+    let byte = 0
+    obj.stalls.forEach(s => {
+      s.ev_type = buffer.readInt16BE(byte)
+      s.ev_isCharging = buffer.readInt16BE(byte + 2)
+      // console.log(byte, buffer.readInt16BE(byte), buffer.readInt16BE(byte + 2), s)
+      byte += 4
+    }) 
   }
 
   forever (def, obj) {
