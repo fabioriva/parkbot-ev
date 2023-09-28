@@ -10,10 +10,6 @@ exports.PLC = {
   polling_time: 999
 }
 
-// exports.EV_STALLS = [215, 265, 269]
-// exports.PW_BACKEND = '13.58.53.66:5500'
-// exports.PW_API = 'https://smartcar.chargeworks.io/sotefin/api/exit_is_enabled' // ?stall=id&cardId=id
-
 exports.QUEUE_LEN = 5
 
 const DB_DATA = 541

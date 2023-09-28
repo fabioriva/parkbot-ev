@@ -1,5 +1,6 @@
 require('dotenv').config()
 const fetch = require('node-fetch')
+const logger = require('pino')()
 const uWS = require('uWebSockets.js')
 const def = require('./def')
 const obj = require('./obj')
@@ -12,11 +13,11 @@ const checkEvStall = async (id, slot) => {
   try {
     const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
     const res = await fetch(url, {
-        headers: {
-               'Content-Type': 'application/json',
-                'x-api-key': process.env.PW_TOKEN
-              },
-	})
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.PW_TOKEN
+      },
+    })
     const json = await res.json()
     console.log('checkEvStall', id, slot, json)
     return json
@@ -31,7 +32,6 @@ const queue = (plc, queue) => {
     const { id, card, slot, size } = element
     // console.log('queue', id, card, slot, size)
     if (slot < 1 || slot > def.STALLS) return
-    // const found = def.EV_STALLS.find(element => element === slot)
     const found = obj.stalls.find(s => s.nr === slot && s.ev_type !== 0)
     if (found === undefined) return
     const json = await checkEvStall(card, slot)
@@ -53,15 +53,52 @@ const queue = (plc, queue) => {
   })
 }
 
+// const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
+
+// const isCharging = async (id, slot) => {
+//   try {
+//     const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+//     const res = await fetch(url, {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': process.env.PW_TOKEN
+//       },
+//     })
+//     const json = await res.json()
+//     logger.info({ json }, 'Checked EV stall %s with ID %s', slot, id)
+//     return Boolean(json.busy)
+//   } catch (err) {
+//     return true
+//   }
+// }
+
+// const unlockEvStall = async (dbNumber, plc, slot) => {
+//   const buffer = Buffer.allocUnsafe(2)
+//   buffer.writeUInt16BE(0, 0)
+//   const conn = {
+//     area: 0x84,
+//     dbNumber,
+//     start: slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2,
+//     amount: 2,
+//     wordLen: 0x02
+//   }
+//   const response = await plc.write(conn, buffer)
+//   logger.info({ conn, response })
+// }
+
+// const checkQueue = (plc, queue) => {
+//   queue.forEach(async item => {
+//     logger.info(item, 'Item %s', item.id)
+//     // console.log(item, isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot))
+//     if (isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot)) {
+//       await unlockEvStall(def.EV_STALLS_READ.dbNumber, plc, item.slot)
+//     }
+//   })
+// }
+
 const start = async () => {
   try {
-    const app = uWS.App().listen(def.HTTP, token => {
-      if (token) {
-        console.log('Listening to port ' + def.HTTP, token)
-      } else {
-        console.log('Failed to listen to port ' + def.HTTP)
-      }
-    })
+    const app = uWS.App().listen(def.HTTP, token => console.info(token))
     const plc = new PLC(def.PLC)
     plc.main(def, obj)
     plc.on('pub', ({ channel, data }) => {
@@ -69,12 +106,13 @@ const start = async () => {
         const overview = JSON.parse(data)
         queue(plc, overview.exitQueue)
         queue(plc, overview.swapQueue)
+        // checkQueue(plc, overview.exitQueue)
+        // checkQueue(plc, overview.swapQueue)
       }
     })
     // routes
     routes(app, def, obj, plc, { prefix })
   } catch (err) {
-    console.log(err)
     console.error(new Error(err))
     process.exit(1)
   }
