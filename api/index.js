@@ -53,48 +53,56 @@ const queue = (plc, queue) => {
   })
 }
 
-// const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
+const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
 
-// const isCharging = async (id, slot) => {
-//   try {
-//     const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
-//     const res = await fetch(url, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'x-api-key': process.env.PW_TOKEN
-//       },
-//     })
-//     const json = await res.json()
-//     logger.info({ json }, 'Checked EV stall %s with ID %s', slot, id)
-//     return Boolean(json.busy)
-//   } catch (err) {
-//     return true
-//   }
-// }
+const isCharging = async (id, slot) => {
+  try {
+    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+    const res = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.PW_TOKEN
+      },
+    })
+    const json = await res.json()
+    logger.info({ json }, 'Checked EV stall %s with ID %s', slot, id)
+    return Boolean(json.busy)
+  } catch (err) {
+    return true
+  }
+}
 
-// const unlockEvStall = async (dbNumber, plc, slot) => {
-//   const buffer = Buffer.allocUnsafe(2)
-//   buffer.writeUInt16BE(0, 0)
-//   const conn = {
-//     area: 0x84,
-//     dbNumber,
-//     start: slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2,
-//     amount: 2,
-//     wordLen: 0x02
-//   }
-//   const response = await plc.write(conn, buffer)
-//   logger.info({ conn, response })
-// }
+const writeEvStall = async (dbNumber, plc, slot, isCharging) => {
+  const buffer = Buffer.allocUnsafe(2)
+  buffer.writeUInt16BE(isCharging, 0)
+  const conn = {
+    area: 0x84,
+    dbNumber,
+    start: slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2,
+    amount: 2,
+    wordLen: 0x02
+  }
+  const response = await plc.write(conn, buffer)
+  logger.info({ conn, response })
+}
 
-// const checkQueue = (plc, queue) => {
-//   queue.forEach(async item => {
-//     logger.info(item, 'Item %s', item.id)
-//     // console.log(item, isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot))
-//     if (isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot)) {
-//       await unlockEvStall(def.EV_STALLS_READ.dbNumber, plc, item.slot)
-//     }
-//   })
-// }
+const checkQueue = (plc, queue) => {
+  queue.forEach(async item => {
+    logger.info(item, 'Item %s', item.id)
+    if (isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot)) {
+      await writeEvStall(def.EV_STALLS_READ.dbNumber, plc, item.slot, 0) // UNLOCK EV STALL
+    }
+  })
+}
+
+const checkDevices = (plc, devices) => {
+  devices.forEach(async item => {
+    logger.info(item, `Device ${item.name}`)
+    if (/*(item.status === 4 || item.status === 5) && */isEvStall(obj.stalls, item.stall) && isCharging(item.card, item.stall)) {
+      await writeEvStall(def.EV_STALLS_READ.dbNumber, plc, item.stall, 1) // LOCK EV STALL
+    }
+  })
+}
 
 const start = async () => {
   try {
@@ -108,6 +116,7 @@ const start = async () => {
         queue(plc, overview.swapQueue)
         // checkQueue(plc, overview.exitQueue)
         // checkQueue(plc, overview.swapQueue)
+        // checkDevices(plc, overview.devices.slice(3))
       }
     })
     // routes
