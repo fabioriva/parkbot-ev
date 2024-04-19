@@ -3,6 +3,7 @@
 # dependencies
 /api/node_modules
 /next/node_modules
+/menlo/node_modules
 
 # misc
 .DS_Store
