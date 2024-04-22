@@ -1,16 +1,10 @@
-exports.APS = 'menlo'
+exports.APS = 'menlo_b'
 // exports.HOST =
 //   process.env.NODE_ENV !== 'production'
 //     ? process.env.DEVELOPMENT_SERVER
 //     : process.env.PRODUCTION_SERVER
 exports.HTTP = 9100
-exports.PLC_A = {
-  ip: '192.168.83.2',
-  rack: 0,
-  slot: 1,
-  polling_time: 999
-}
-exports.PLC_B = {
+exports.PLC = {
   ip: '192.168.83.102',
   rack: 0,
   slot: 1,
@@ -40,12 +34,12 @@ exports.REQ_SWAP = {
   wordLen: 0x02
 }
 
-const CARDS = 242
+const CARDS = 228
 // const CARD_LEN = 10
 exports.CARDS = CARDS
 // exports.CARD_LEN = CARD_LEN
 
-const STALLS = 248
+const STALLS = 234
 const STALL_LEN = 10
 exports.STALLS = STALLS
 exports.STALL_LEN = STALL_LEN

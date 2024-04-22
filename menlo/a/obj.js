@@ -1,7 +1,7 @@
 const def = require('./def')
-const { Device } = require('./Device')
-const { generateQueue } = require('./Queue')
-const { generateStalls } = require('./Stall')
+const { Device } = require('../Device')
+const { generateQueue } = require('../Queue')
+const { generateStalls } = require('../Stall')
 
 const EU1 = new Device(1, 'EU1')
 const EU2 = new Device(2, 'EU2')

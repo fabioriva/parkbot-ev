@@ -3,9 +3,9 @@ const logger = require('pino')()
 const uWS = require('uWebSockets.js')
 const def = require('./def')
 const obj = require('./obj')
-const Plc = require('./Plc')
-const Router = require('./Router')
-const { WriteArea } = require('./utils7')
+const Plc = require('../Plc')
+const Router = require('../Router')
+const { WriteArea } = require('../utils7')
 
 const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
 
@@ -77,7 +77,7 @@ const checkQueue = (plc, queue) => {
 const start = async () => {
   try {
     const app = uWS.App().listen(def.HTTP, token => console.info(token))
-    const plc = new Plc(def.PLC_A)
+    const plc = new Plc(def.PLC)
     plc.on('pub', ({ channel, data }) => {
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
@@ -89,7 +89,7 @@ const start = async () => {
     plc.run(def, obj)
     plc.data(def, obj)
     // Map
-    const plc_ = new Plc(def.PLC_A)
+    const plc_ = new Plc(def.PLC)
     plc_.run(def, obj)
     plc_.map(def, obj)
     const router = new Router(app, plc)

@@ -1,13 +1,13 @@
 {
   "name": "parkbot-ev",
   "version": "1.0.0",
-  "description": "Menlo Park EV interface",
+  "description": "EV interface for Menlo APS",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
-    "a": "nodemon menloA",
-    "b": "nodemon menloB",
+    "a": "nodemon a/",
+    "b": "nodemon b/",
     "start": "NODE_ENV=production pm2 start index.js --name api-menlo-ev --max-memory-restart 128M",
     "install": "npm i uWebSockets.js@uNetworking/uWebSockets.js#v20.43.0",
     "server": "nodemon server"

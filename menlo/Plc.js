@@ -26,8 +26,8 @@ class PLC extends EventEmitter {
 
   data (def, obj) {
     setTimeout(async () => {
-      const ping = process.hrtime()
       if (this.online) {
+        const ping = process.hrtime()
         try {
           const { area, dbNumber, start, amount, wordLen } = def.DATA_READ
           const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
@@ -41,6 +41,7 @@ class PLC extends EventEmitter {
         } finally {
           this.publish('aps/overview', obj.overview)
         }
+        this.exec_time(ping, 'data')
       } else {
         this.online = this.client.Connect()
         this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
@@ -52,15 +53,14 @@ class PLC extends EventEmitter {
       this.publish('aps/info', {
         comm: this.online
       })
-      this.exec_time(ping, 'data')
       this.data(def, obj)
     }, this.params.polling_time)
   }
 
   map (def, obj) {
     setTimeout(async () => {
-      const ping = process.hrtime()
       if (this.online) {
+        const ping = process.hrtime()
         try {
           const { area, dbNumber, start, amount, wordLen } = def.MAP_READ
           const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
@@ -74,6 +74,7 @@ class PLC extends EventEmitter {
         } finally {
           this.init(def, obj)
         }
+        this.exec_time(ping, 'map')
       } else {
         this.online = this.client.Connect()
         this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
@@ -85,7 +86,6 @@ class PLC extends EventEmitter {
       this.publish('aps/info', {
         comm: this.online
       })
-      this.exec_time(ping, 'map')
       this.map(def, obj)
     }, this.params.polling_time)
   }
