@@ -1,4 +1,4 @@
-exports.APS = 'menlo_a'
+exports.APS = 'menlo'
 // exports.HOST =
 //   process.env.NODE_ENV !== 'production'
 //     ? process.env.DEVELOPMENT_SERVER
