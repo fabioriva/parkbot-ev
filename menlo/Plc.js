@@ -25,10 +25,11 @@ class PLC extends EventEmitter {
   }
 
   data (def, obj) {
-    setTimeout(async () => {
-      if (this.online) {
-        const ping = process.hrtime()
-        try {
+    try {
+      setTimeout(async () => {
+        if (this.online) {
+          const ping = process.hrtime()
+
           const { area, dbNumber, start, amount, wordLen } = def.DATA_READ
           const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
           await Promise.all([
@@ -36,32 +37,34 @@ class PLC extends EventEmitter {
             updateQueue(def.DB_DATA_INIT_EXIT_QUEUE, buffer, 6, obj.exitQueue),
             updateQueue(def.DB_DATA_INIT_SWAP_QUEUE, buffer, 6, obj.swapQueue)
           ])
-        } catch (error) {
-          this.error(error)
-        } finally {
-          this.publish('aps/overview', obj.overview)
+
+          this.exec_time(ping, 'data')
+        } else {
+          this.online = this.client.Connect()
+          this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
         }
-        this.exec_time(ping, 'data')
-      } else {
-        this.online = this.client.Connect()
-        this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
-      }
-      if (this.online_ !== this.online) {
+        if (this.online_ !== this.online) {
         // console.log('----------------------------INIT DATA----------------------------')
-        this.online_ = this.online
-      }
-      this.publish('aps/info', {
-        comm: this.online
-      })
-      this.data(def, obj)
-    }, this.params.polling_time)
+          this.online_ = this.online
+        }
+        this.publish('aps/info', {
+          comm: this.online
+        })
+        this.data(def, obj)
+      }, this.params.polling_time)
+    } catch (error) {
+      this.error(error)
+    } finally {
+      this.publish('aps/overview', obj.overview)
+    }
   }
 
   map (def, obj) {
-    setTimeout(async () => {
-      if (this.online) {
-        const ping = process.hrtime()
-        try {
+    try {
+      setTimeout(async () => {
+        if (this.online) {
+          const ping = process.hrtime()
+
           const { area, dbNumber, start, amount, wordLen } = def.MAP_READ
           const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
           await updateStalls(0, buffer, def.STALL_LEN, obj.stalls)
@@ -69,37 +72,42 @@ class PLC extends EventEmitter {
           // const data = occupancy(0, stalls, def.STALL_STATUS)
           // obj.map.occupancy = data
           // this.publish('aps/stalls', stalls)
-        } catch (e) {
-          this.error(e)
-        } finally {
-          this.init(def, obj)
+
+          this.exec_time(ping, 'map')
+        } else {
+          this.online = this.client.Connect()
+          this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
         }
-        this.exec_time(ping, 'map')
-      } else {
-        this.online = this.client.Connect()
-        this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
-      }
-      if (this.online_ !== this.online) {
+        if (this.online_ !== this.online) {
         // console.log('----------------------------INIT MAP----------------------------')
-        this.online_ = this.online
-      }
-      this.publish('aps/info', {
-        comm: this.online
-      })
-      this.map(def, obj)
-    }, this.params.polling_time)
+          this.online_ = this.online
+        }
+        this.publish('aps/info', {
+          comm: this.online
+        })
+        this.map(def, obj)
+      }, this.params.polling_time)
+    } catch (e) {
+      this.error(e)
+    } finally {
+      this.init(def, obj)
+    }
   }
 
   async init (def, obj) {
-    const { area, dbNumber, start, amount, wordLen } = def.EV_STALLS_READ
-    const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
-    let byte = 0
-    obj.stalls.forEach(s => {
-      s.ev_type = buffer.readInt16BE(byte)
-      s.ev_isCharging = buffer.readInt16BE(byte + 2)
-      // console.log(byte, buffer.readInt16BE(byte), buffer.readInt16BE(byte + 2), s)
-      byte += 4
-    })
+    try {
+      const { area, dbNumber, start, amount, wordLen } = def.EV_STALLS_READ
+      const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
+      let byte = 0
+      obj.stalls.forEach(s => {
+        s.ev_type = buffer.readInt16BE(byte)
+        s.ev_isCharging = buffer.readInt16BE(byte + 2)
+        // console.log(byte, buffer.readInt16BE(byte), buffer.readInt16BE(byte + 2), s)
+        byte += 4
+      })
+    } catch (e) {
+      this.error(e)
+    }
   }
 
   async run (def, obj) {
