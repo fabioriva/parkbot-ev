@@ -16,7 +16,7 @@ class PLC extends EventEmitter {
 
   exec_time (ping, func_) {
     const pong = process.hrtime(ping)
-    console.info(`Execution time in millisecond: ${(pong[0] * 1000000000 + pong[1]) / 1000000}\t${func_}`)
+    // console.info(`Execution time in millisecond: ${(pong[0] * 1000000000 + pong[1]) / 1000000}\t${func_}`)
   }
 
   error (e) {
