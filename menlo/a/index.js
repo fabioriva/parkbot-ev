@@ -1,4 +1,5 @@
 require('dotenv').config()
+const fetch = require('node-fetch')
 const logger = require('pino')()
 const uWS = require('uWebSockets.js')
 const def = require('./def')
@@ -12,6 +13,7 @@ const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && st
 const isCharging = async (id, slot) => {
   try {
     const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+    console.log(url)
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +83,7 @@ const start = async () => {
     plc.on('pub', ({ channel, data }) => {
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
-        // checkQueue(plc, overview.exitQueue)
+        checkQueue(plc, overview.exitQueue)
         checkQueue(plc, overview.swapQueue)
         // checkDevices(plc, overview.devices.slice(3))
       }
