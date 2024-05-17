@@ -1,10 +1,15 @@
 const EventEmitter = require('events')
-const logger = require('pino')()
+const pino = require('pino')
 const snap7 = require('node-snap7')
 const { ReadArea } = require('./utils7')
 const { updateDevices } = require('./Device')
 const { updateQueue } = require('./Queue')
 const { updateStalls } = require('./Stall')
+
+const logger = pino({
+  msgPrefix: '[PARKBOT-EV] ',
+  timestamp: pino.stdTimeFunctions.isoTime
+})
 
 class PLC extends EventEmitter {
   constructor (plc) {
@@ -16,7 +21,7 @@ class PLC extends EventEmitter {
 
   exec_time (ping, func_) {
     const pong = process.hrtime(ping)
-    // console.info(`Execution time in millisecond: ${(pong[0] * 1000000000 + pong[1]) / 1000000}\t${func_}`)
+    logger.info(`Execution time in millisecond: ${(pong[0] * 1000000000 + pong[1]) / 1000000}\t${func_}`)
   }
 
   error (e) {
@@ -28,8 +33,7 @@ class PLC extends EventEmitter {
     try {
       setTimeout(async () => {
         if (this.online) {
-          const ping = process.hrtime()
-
+          // const ping = process.hrtime()
           const { area, dbNumber, start, amount, wordLen } = def.DATA_READ
           const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
           await Promise.all([
@@ -37,14 +41,12 @@ class PLC extends EventEmitter {
             updateQueue(def.DB_DATA_INIT_EXIT_QUEUE, buffer, 6, obj.exitQueue),
             updateQueue(def.DB_DATA_INIT_SWAP_QUEUE, buffer, 6, obj.swapQueue)
           ])
-
-          this.exec_time(ping, 'data')
+          // this.exec_time(ping, 'data')
         } else {
           this.online = this.client.Connect()
           this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
         }
         if (this.online_ !== this.online) {
-        // console.log('----------------------------INIT DATA----------------------------')
           this.online_ = this.online
         }
         this.publish('aps/info', {
@@ -63,23 +65,16 @@ class PLC extends EventEmitter {
     try {
       setTimeout(async () => {
         if (this.online) {
-          const ping = process.hrtime()
-
+          // const ping = process.hrtime()
           const { area, dbNumber, start, amount, wordLen } = def.MAP_READ
           const buffer = this.online ? await ReadArea(this.client, area, dbNumber, start, amount, wordLen) : Buffer.alloc(amount)
           await updateStalls(0, buffer, def.STALL_LEN, obj.stalls)
-          // const stalls = await updateStalls(0, buffer, def.STALL_LEN, obj.stalls)
-          // const data = occupancy(0, stalls, def.STALL_STATUS)
-          // obj.map.occupancy = data
-          // this.publish('aps/stalls', stalls)
-
-          this.exec_time(ping, 'map')
+          // this.exec_time(ping, 'map')
         } else {
           this.online = this.client.Connect()
           this.online ? logger.info('Connected to PLC %s', this.params.ip) : logger.info('Connecting to PLC %s ...', this.params.ip)
         }
         if (this.online_ !== this.online) {
-        // console.log('----------------------------INIT MAP----------------------------')
           this.online_ = this.online
         }
         this.publish('aps/info', {
@@ -102,7 +97,6 @@ class PLC extends EventEmitter {
       obj.stalls.forEach(s => {
         s.ev_type = buffer.readInt16BE(byte)
         s.ev_isCharging = buffer.readInt16BE(byte + 2)
-        // console.log(byte, buffer.readInt16BE(byte), buffer.readInt16BE(byte + 2), s)
         byte += 4
       })
     } catch (e) {
@@ -113,7 +107,6 @@ class PLC extends EventEmitter {
   async run (def, obj) {
     try {
       this.online = this.client.ConnectTo(this.params.ip, this.params.rack, this.params.slot)
-      // this.forever(def, obj)
     } catch (e) {
       this.error(e)
     }

@@ -1,6 +1,16 @@
-const logger = require('pino')()
-const { /* readJson, */sendJson, Message } = require('./json')
+const pino = require('pino')
+const { sendJson, Message } = require('./json')
 const { WriteArea } = require('./utils7')
+
+const logger = pino({
+  msgPrefix: '[PARKBOT-EV] ',
+  timestamp: pino.stdTimeFunctions.isoTime
+})
+
+const PARAM_NOT_VALID = 'parameters not valid'
+const CARD_OUT_OF_RANGE = 'card out of range'
+const CARD_NOT_PRESENT = 'card not present'
+const NOT_PARKED_IN_EV = 'card not parked in EV stall'
 
 class Router {
   constructor (app, plc) {
@@ -10,7 +20,7 @@ class Router {
 
   exec_time (ping, func_) {
     const pong = process.hrtime(ping)
-    console.info(`Execution time in millisecond: ${(pong[0] * 1000000000 + pong[1]) / 1000000}\t${func_}`)
+    logger.info(`Execution time in millisecond: ${(pong[0] * 1000000000 + pong[1]) / 1000000}\t${func_}`)
   }
 
   log (req) {
@@ -42,19 +52,24 @@ class Router {
     this.app.get(prefix + '/swap/:card', async (res, req) => {
       this.log(req)
       const card = parseInt(req.getParameter(0))
-      console.log('swap card', req.getParameter(0), typeof card, card)
+      logger.info({ card }, 'request to swap')
       if (!Number.isInteger(card)) {
-        return sendJson(res, new Message('warning', 'Parameters not valid'))
+        logger.warn({ card }, PARAM_NOT_VALID)
+        return sendJson(res, new Message('warning', PARAM_NOT_VALID))
       }
       if (card < 1 || card > def.CARDS) {
-        return sendJson(res, new Message('warning', 'Card out of range'))
+        logger.warn({ card }, CARD_OUT_OF_RANGE)
+        return sendJson(res, new Message('warning', CARD_OUT_OF_RANGE))
       }
       const stall = obj.stalls.find(s => s.status === card)
       if (stall === undefined) {
-        return sendJson(res, new Message('warning', 'Card not present'))
+        logger.warn({ card }, CARD_NOT_PRESENT)
+
+        return sendJson(res, new Message('warning', CARD_NOT_PRESENT))
       }
       if (obj.stalls.find(s => s.nr === stall.nr && s.ev_type !== 0) === undefined) {
-        return sendJson(res, new Message('warning', 'Card not parked in EV stall'))
+        logger.warn({ card }, NOT_PARKED_IN_EV)
+        return sendJson(res, new Message('warning', NOT_PARKED_IN_EV))
       }
       res.onAborted(() => {
         res.aborted = true
@@ -63,6 +78,7 @@ class Router {
       buffer.writeUInt16BE(card, 0)
       const { area, dbNumber, start, amount, wordLen } = def.REQ_SWAP
       const response = await WriteArea(this.plc.client, area, dbNumber, start, amount, wordLen, buffer)
+      logger.info({ card, response }, response ? 'write ok' : 'write error')
       sendJson(
         res,
         new Message(
