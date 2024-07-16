@@ -14,10 +14,10 @@ exports.PLC = {
 exports.QUEUE_LEN = 5
 
 const DB_DATA = 506
-const DB_DATA_LEN = 104
+const DB_DATA_LEN = 106
 exports.DB_DATA_INIT_DEVICE = 0
 exports.DB_DATA_INIT_EXIT_QUEUE = 36
-exports.DB_DATA_INIT_SWAP_QUEUE = 70
+exports.DB_DATA_INIT_SWAP_QUEUE = 72
 
 exports.DATA_READ = {
   area: 0x84,
@@ -26,10 +26,17 @@ exports.DATA_READ = {
   amount: DB_DATA_LEN,
   wordLen: 0x02
 }
+exports.REQ_EXIT = {
+  area: 0x84,
+  dbNumber: DB_DATA,
+  start: 70,
+  amount: 2,
+  wordLen: 0x02
+}
 exports.REQ_SWAP = {
   area: 0x84,
   dbNumber: DB_DATA,
-  start: 104,
+  start: 106,
   amount: 2,
   wordLen: 0x02
 }

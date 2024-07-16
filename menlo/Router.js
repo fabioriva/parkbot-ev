@@ -37,6 +37,39 @@ class Router {
       this.log(req)
       res.end('Resource not found')
     })
+    this.app.get(prefix + '/exit/:card', async (res, req) => {
+      this.log(req)
+      const card = parseInt(req.getParameter(0))
+      logger.info({ card }, 'request to exit')
+      if (!Number.isInteger(card)) {
+        logger.warn({ card }, PARAM_NOT_VALID)
+        return sendJson(res, new Message('warning', PARAM_NOT_VALID))
+      }
+      if (card < 1 || card > def.CARDS) {
+        logger.warn({ card }, CARD_OUT_OF_RANGE)
+        return sendJson(res, new Message('warning', CARD_OUT_OF_RANGE))
+      }
+      const stall = obj.stalls.find(s => s.status === card)
+      if (stall === undefined) {
+        logger.warn({ card }, CARD_NOT_PRESENT)
+        return sendJson(res, new Message('warning', CARD_NOT_PRESENT))
+      }
+      res.onAborted(() => {
+        res.aborted = true
+      })
+      const buffer = Buffer.alloc(2)
+      buffer.writeUInt16BE(card, 0)
+      const { area, dbNumber, start, amount, wordLen } = def.REQ_EXIT
+      const response = await WriteArea(this.plc.client, area, dbNumber, start, amount, wordLen, buffer)
+      logger.info({ card, response }, response ? 'write ok' : 'write error')
+      sendJson(
+        res,
+        new Message(
+          response ? 'success' : 'error',
+          response ? 'Sent exit request for card ' + card : 'Write error!'
+        )
+      )
+    })
     this.app.get(prefix + '/overview', (res, req) => {
       this.log(req)
       sendJson(res, obj.overview)
@@ -64,7 +97,6 @@ class Router {
       const stall = obj.stalls.find(s => s.status === card)
       if (stall === undefined) {
         logger.warn({ card }, CARD_NOT_PRESENT)
-
         return sendJson(res, new Message('warning', CARD_NOT_PRESENT))
       }
       if (obj.stalls.find(s => s.nr === stall.nr && s.ev_type !== 0) === undefined) {
