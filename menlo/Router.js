@@ -119,6 +119,34 @@ class Router {
         )
       )
     })
+    this.app.get(prefix + '/swap/delete/:card', async (res, req) => {
+      this.log(req)
+      const card = parseInt(req.getParameter(0))
+      logger.info({ card }, 'request to delete card in swap queue')
+      if (!Number.isInteger(card)) {
+        logger.warn({ card }, PARAM_NOT_VALID)
+        return sendJson(res, new Message('warning', PARAM_NOT_VALID))
+      }
+      if (card < 1 || card > def.CARDS) {
+        logger.warn({ card }, CARD_OUT_OF_RANGE)
+        return sendJson(res, new Message('warning', CARD_OUT_OF_RANGE))
+      }
+      res.onAborted(() => {
+        res.aborted = true
+      })
+      const buffer = Buffer.alloc(2)
+      buffer.writeUInt16BE(card, 0)
+      const { area, dbNumber, start, amount, wordLen } = def.REQ_DEL
+      const response = await WriteArea(this.plc.client, area, dbNumber, start, amount, wordLen, buffer)
+      logger.info({ card, response }, response ? 'write ok' : 'write error')
+      sendJson(
+        res,
+        new Message(
+          response ? 'success' : 'error',
+          response ? 'Sent delete swap request for card ' + card : 'Write error!'
+        )
+      )
+    })
   }
 }
 

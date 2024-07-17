@@ -14,7 +14,7 @@ exports.PLC = {
 exports.QUEUE_LEN = 5
 
 const DB_DATA = 506
-const DB_DATA_LEN = 106
+const DB_DATA_LEN = 132
 exports.DB_DATA_INIT_DEVICE = 0
 exports.DB_DATA_INIT_EXIT_QUEUE = 36
 exports.DB_DATA_INIT_SWAP_QUEUE = 72
