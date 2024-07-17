@@ -36,11 +36,17 @@ exports.REQ_EXIT = {
 exports.REQ_SWAP = {
   area: 0x84,
   dbNumber: DB_DATA,
-  start: 106,
+  start: 136,
   amount: 2,
   wordLen: 0x02
 }
-
+exports.REQ_DEL = {
+  area: 0x84,
+  dbNumber: DB_DATA,
+  start: 138,
+  amount: 2,
+  wordLen: 0x02
+}
 const CARDS = 242
 // const CARD_LEN = 10
 exports.CARDS = CARDS
