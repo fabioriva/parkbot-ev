@@ -78,7 +78,7 @@ const start = async () => {
     plc.on('pub', ({ channel, data }) => {
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
-        // checkQueue(def.APS, plc, overview.exitQueue)
+        checkQueue(def.APS, plc, overview.exitQueue)
         checkQueue(def.APS, plc, overview.swapQueue)
         // checkDevices(plc, overview.devices.slice(3))
       }
