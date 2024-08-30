@@ -15,9 +15,9 @@ const logger = pino({
 
 const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
 
-const isCharging = async (id, slot) => {
+const isCharging = async (aps, id, slot) => {
   try {
-    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}&location=${aps}`
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -51,10 +51,10 @@ const writeEvStall = async (plc, id, slot, notCharging) => {
 }
 
 // If stall is EV and not charging write to enable exit call
-const checkQueue = (plc, queue) => {
+const checkQueue = (aps, plc, queue) => {
   queue.forEach(async item => {
     if (item.card >= 1 && item.card <= def.CARDS && isEvStall(obj.stalls, item.slot)) {
-      const charge = await isCharging(item.card, item.slot)
+      const charge = await isCharging(aps, item.card, item.slot)
       if (!charge) {
         await writeEvStall(plc, item.card, item.slot, 0) // UNLOCK EV STALL
       }
@@ -78,8 +78,8 @@ const start = async () => {
     plc.on('pub', ({ channel, data }) => {
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
-        checkQueue(plc, overview.exitQueue)
-        checkQueue(plc, overview.swapQueue)
+        // checkQueue(def.APS, plc, overview.exitQueue)
+        checkQueue(def.APS, plc, overview.swapQueue)
         // checkDevices(plc, overview.devices.slice(3))
       }
     })

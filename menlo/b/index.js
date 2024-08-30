@@ -1,11 +1,17 @@
 require('dotenv').config()
-const logger = require('pino')()
+const fetch = require('node-fetch')
+const pino = require('pino')
 const uWS = require('uWebSockets.js')
 const def = require('./def')
 const obj = require('./obj')
 const Plc = require('../Plc')
 const Router = require('../Router')
 const { WriteArea } = require('../utils7')
+
+const logger = pino({
+  msgPrefix: '[PARKBOT-EV] ',
+  timestamp: pino.stdTimeFunctions.isoTime
+})
 
 const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
 
@@ -21,45 +27,36 @@ const isCharging = async (aps, id, slot) => {
     const json = await res.json()
     logger.info({ json }, 'Checked EV stall %s with ID %s', slot, id)
     const busy = json.busy !== undefined ? Boolean(json.busy) : true
-    console.log('Fetch ok', slot, busy ? 'EV is charging, exit disabled' : 'Exit is enabled')
+    logger.info({ id, slot }, busy ? 'EV is charging, exit disabled' : 'Exit is enabled')
     return busy
   } catch (err) {
-    console.log('Fetch err', err)
+    logger.error(err, 'fetch error')
     return true
   }
 }
 
-const writeEvStall = async (plc, slot, isCharging) => {
-  const buffer = Buffer.alloc(2)
-  buffer.writeUInt16BE(isCharging, 0)
-  const { area, dbNumber } = def.EV_STALLS_READ
-  const start = slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2
-  console.log(area, dbNumber, start, 2, 0x02, buffer)
-  const response = await WriteArea(plc.client, area, dbNumber, start, 2, 0x02, buffer)
-  logger.info({ slot, response })
+const writeEvStall = async (plc, id, slot, notCharging) => {
+  try {
+    const buffer = Buffer.alloc(2)
+    buffer.writeUInt16BE(notCharging, 0)
+    const { area, dbNumber } = def.EV_STALLS_READ
+    const start = slot === 1 ? 0 + 2 : (slot - 1) * 4 + 2
+    logger.info({ area, dbNumber, start, buffer }, 'write params')
+    const response = await WriteArea(plc.client, area, dbNumber, start, 2, 0x02, buffer)
+    logger.info({ id, slot, response }, response ? 'write ok' : 'write error')
+  } catch (err) {
+    logger.error(err, 'write error')
+    return true
+  }
 }
 
 // If stall is EV and not charging write to enable exit call
 const checkQueue = (aps, plc, queue) => {
   queue.forEach(async item => {
-    // logger.info(item, 'Item %s', item.id)
     if (item.card >= 1 && item.card <= def.CARDS && isEvStall(obj.stalls, item.slot)) {
-      // const valid = isEvStall(obj.stalls, item.slot)
-      // const charge = valid ? await isCharging(item.card, item.slot) : true
-      // console.log('isEvStall:', item, valid)
-      // console.log('isCharging:', item, charge)
-      // console.log('Queue check result:', item, valid && !charge)
-      // if (valid && !charge) {
-      //   console.log('unlock EV slot', item)
-      // }
-    // console.log(item, (isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot)))
-    // if (isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot)) {
-    //   await writeEvStall(plc, item.slot, 0) // UNLOCK EV STALL
-    // }
       const charge = await isCharging(aps, item.card, item.slot)
       if (!charge) {
-        console.log('unlock EV slot', item)
-        await writeEvStall(plc, item.slot, 0) // UNLOCK EV STALL
+        await writeEvStall(plc, item.card, item.slot, 0) // UNLOCK EV STALL
       }
     }
   })
@@ -98,7 +95,7 @@ const start = async () => {
     const trouter = new Router(app, plc)
     trouter.run(def, obj, '/aps/ev/menlo')
   } catch (err) {
-    console.error(new Error(err))
+    logger.error(new Error(err))
     process.exit(1)
   }
 }
