@@ -1,0 +1,36 @@
+{
+  "name": "parkbot-ev",
+  "version": "1.0.0",
+  "description": "Parkworks/Sotefin EV interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard",
+    "dev": "nodemon",
+    "start": "NODE_ENV=production pm2 start index.js --name api --max-memory-restart 128M",
+    "install": "npm i uWebSockets.js@uNetworking/uWebSockets.js#v20.6.0"
+  },
+  "keywords": [
+    "Parkbot",
+    "Raspberry",
+    "embedded"
+  ],
+  "author": "Fabio Riva",
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "^2.28.0",
+    "dotenv": "^16.0.0",
+    "node-fetch": "^2.6.1",
+    "node-snap7": "^1.0.6",
+    "pino": "^8.15.1",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "standard": "^17.1.0"
+  },
+  "standard": {
+    "ignore": [
+      "/public"
+    ]
+  }
+}
