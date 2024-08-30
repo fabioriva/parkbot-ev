@@ -9,9 +9,9 @@ const { WriteArea } = require('../utils7')
 
 const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && stall.ev_type !== 0)
 
-const isCharging = async (id, slot) => {
+const isCharging = async (aps, id, slot) => {
   try {
-    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}&location=${aps}`
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ const writeEvStall = async (plc, slot, isCharging) => {
 }
 
 // If stall is EV and not charging write to enable exit call
-const checkQueue = (plc, queue) => {
+const checkQueue = (aps, plc, queue) => {
   queue.forEach(async item => {
     // logger.info(item, 'Item %s', item.id)
     if (item.card >= 1 && item.card <= def.CARDS && isEvStall(obj.stalls, item.slot)) {
@@ -56,7 +56,7 @@ const checkQueue = (plc, queue) => {
     // if (isEvStall(obj.stalls, item.slot) && !isCharging(item.card, item.slot)) {
     //   await writeEvStall(plc, item.slot, 0) // UNLOCK EV STALL
     // }
-      const charge = await isCharging(item.card, item.slot)
+      const charge = await isCharging(aps, item.card, item.slot)
       if (!charge) {
         console.log('unlock EV slot', item)
         await writeEvStall(plc, item.slot, 0) // UNLOCK EV STALL
@@ -81,8 +81,8 @@ const start = async () => {
     plc.on('pub', ({ channel, data }) => {
       if (channel === 'aps/overview') {
         const overview = JSON.parse(data)
-        // checkQueue(plc, overview.exitQueue)
-        checkQueue(plc, overview.swapQueue)
+        // checkQueue(def.APS, plc, overview.exitQueue)
+        checkQueue(def.APS, plc, overview.swapQueue)
         // checkDevices(plc, overview.devices.slice(3))
       }
     })
@@ -93,7 +93,10 @@ const start = async () => {
     plc_.run(def, obj)
     plc_.map(def, obj)
     const router = new Router(app, plc)
-    router.run(def, obj)
+    router.run(def, obj, `/aps/${def.APS}/ev`)
+    // temp routes
+    const trouter = new Router(app, plc)
+    trouter.run(def, obj, '/aps/ev/menlo')
   } catch (err) {
     console.error(new Error(err))
     process.exit(1)

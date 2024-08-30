@@ -31,8 +31,9 @@ class Router {
     })
   }
 
-  run (def, obj) {
-    const prefix = '/aps/ev/' + def.APS
+  run (def, obj, prefix) {
+    // const prefix = `/aps/${def.APS}/ev`
+    // console.log(prefix)
     this.app.get('/*', (res, req) => {
       this.log(req)
       res.end('Resource not found')

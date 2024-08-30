@@ -90,7 +90,10 @@ const start = async () => {
     plc_.run(def, obj)
     plc_.map(def, obj)
     const router = new Router(app, plc)
-    router.run(def, obj)
+    router.run(def, obj, `/aps/${def.APS}/ev`)
+    // temp routes
+    const trouter = new Router(app, plc)
+    trouter.run(def, obj, '/aps/ev/menlo')
   } catch (err) {
     logger.error(new Error(err))
     process.exit(1)
