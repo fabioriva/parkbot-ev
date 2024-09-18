@@ -17,7 +17,8 @@ const isEvStall = (stalls, slot) => stalls.some(stall => stall.nr === slot && st
 
 const isCharging = async (aps, id, slot) => {
   try {
-    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}&location=${aps}`
+    // const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}&location=${aps}`
+    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}&location=menlo_b`
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
