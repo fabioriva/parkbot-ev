@@ -11,7 +11,7 @@ const prefix = '/api/wallstreet'
 
 const checkEvStall = async (id, slot) => {
   try {
-    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}`
+    const url = `${process.env.PW_API}?stall=${slot}&cardID=${id}&location=spire`
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
