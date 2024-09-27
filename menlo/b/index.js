@@ -54,7 +54,7 @@ const writeEvStall = async (plc, id, slot, notCharging) => {
 // If stall is EV and not charging write to enable exit call
 const checkQueue = (aps, plc, queue) => {
   queue.forEach(async item => {
-    if (item.card >= 1 && item.card <= def.CARDS && isEvStall(obj.stalls, item.slot)) {
+    if (item.card >= def.CARD_MIN && item.card <= def.CARD_MAX && isEvStall(obj.stalls, item.slot)) {
       const charge = await isCharging(aps, item.card, item.slot)
       if (!charge) {
         await writeEvStall(plc, item.card, item.slot, 0) // UNLOCK EV STALL

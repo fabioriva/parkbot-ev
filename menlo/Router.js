@@ -46,7 +46,7 @@ class Router {
         logger.warn({ card }, PARAM_NOT_VALID)
         return sendJson(res, new Message('warning', PARAM_NOT_VALID))
       }
-      if (card < 1 || card > def.CARDS) {
+      if (card < def.CARD_MIN || card > def.CARD_MAX) {
         logger.warn({ card }, CARD_OUT_OF_RANGE)
         return sendJson(res, new Message('warning', CARD_OUT_OF_RANGE))
       }
@@ -91,7 +91,7 @@ class Router {
         logger.warn({ card }, PARAM_NOT_VALID)
         return sendJson(res, new Message('warning', PARAM_NOT_VALID))
       }
-      if (card < 1 || card > def.CARDS) {
+      if (card < def.CARD_MIN || card > def.CARD_MAX) {
         logger.warn({ card }, CARD_OUT_OF_RANGE)
         return sendJson(res, new Message('warning', CARD_OUT_OF_RANGE))
       }
@@ -128,7 +128,7 @@ class Router {
         logger.warn({ card }, PARAM_NOT_VALID)
         return sendJson(res, new Message('warning', PARAM_NOT_VALID))
       }
-      if (card < 1 || card > def.CARDS) {
+      if (card < def.CARD_MIN || card > def.CARD_MAX) {
         logger.warn({ card }, CARD_OUT_OF_RANGE)
         return sendJson(res, new Message('warning', CARD_OUT_OF_RANGE))
       }

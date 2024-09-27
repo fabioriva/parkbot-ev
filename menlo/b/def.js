@@ -47,9 +47,11 @@ exports.REQ_DEL = {
   amount: 2,
   wordLen: 0x02
 }
-const CARDS = 228
+const CARD_MIN = 243
+exports.CARD_MIN = CARD_MIN
+const CARD_MAX = 471
+exports.CARD_MAX = CARD_MAX
 // const CARD_LEN = 10
-exports.CARDS = CARDS
 // exports.CARD_LEN = CARD_LEN
 
 const STALLS = 234
@@ -77,10 +79,10 @@ exports.EV_STALLS_READ = {
   amount: STALLS * 4,
   wordLen: 0x02
 }
-// exports.EV_CARDS_READ = {
+// exports.EV_CARD_MAX_READ = {
 //   area: 0x84,
 //   dbNumber: 543,
 //   start: 0,
-//   amount: CARDS * 2,
+//   amount: CARD_MAX * 2,
 //   wordLen: 0x02
 // }
