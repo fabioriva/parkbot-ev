@@ -11,7 +11,8 @@ exports.PLC = {
   polling_time: 999
 }
 
-exports.QUEUE_LEN = 5
+exports.EXIT_QUEUE_LEN = 5
+exports.SWAP_QUEUE_LEN = 5
 
 const DB_DATA = 506
 const DB_DATA_LEN = 132

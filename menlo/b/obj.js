@@ -14,10 +14,10 @@ const devices = [EU1, EU2, EU3, T1, T2, T3]
 
 exports.devices = devices
 
-const exitQueue = generateQueue(def.QUEUE_LEN)
+const exitQueue = generateQueue(def.EXIT_QUEUE_LEN)
 exports.exitQueue = exitQueue
 
-const swapQueue = generateQueue(def.QUEUE_LEN)
+const swapQueue = generateQueue(def.SWAP_QUEUE_LEN)
 exports.swapQueue = swapQueue
 
 exports.overview = {
