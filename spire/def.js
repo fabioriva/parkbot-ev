@@ -2,7 +2,7 @@ exports.HOST =
   process.env.NODE_ENV !== 'production'
     ? process.env.DEVELOPMENT_SERVER
     : process.env.PRODUCTION_SERVER
-exports.HTTP = 8080 // 9101
+exports.HTTP = 9100
 exports.PLC = {
   ip: '192.168.67.2',
   rack: 0,
