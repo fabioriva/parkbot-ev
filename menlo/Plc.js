@@ -7,6 +7,7 @@ const { updateQueue } = require('./Queue')
 const { updateStalls } = require('./Stall')
 
 const logger = pino({
+  level: 'warn',
   msgPrefix: '[PARKBOT-EV] ',
   timestamp: pino.stdTimeFunctions.isoTime
 })

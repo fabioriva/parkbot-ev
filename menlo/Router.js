@@ -3,6 +3,7 @@ const { sendJson, Message } = require('./json')
 const { WriteArea } = require('./utils7')
 
 const logger = pino({
+  level: 'warn',
   msgPrefix: '[PARKBOT-EV] ',
   timestamp: pino.stdTimeFunctions.isoTime
 })

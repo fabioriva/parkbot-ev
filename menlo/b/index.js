@@ -9,6 +9,7 @@ const Router = require('../Router')
 const { WriteArea } = require('../utils7')
 
 const logger = pino({
+  level: 'warn',
   msgPrefix: '[PARKBOT-EV] ',
   timestamp: pino.stdTimeFunctions.isoTime
 })
