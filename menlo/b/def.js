@@ -12,7 +12,7 @@ exports.PLC = {
 }
 
 exports.EXIT_QUEUE_LEN = 5
-exports.SWAP_QUEUE_LEN = 5
+exports.SWAP_QUEUE_LEN = 10
 
 const DB_DATA = 506
 const DB_DATA_LEN = 132
